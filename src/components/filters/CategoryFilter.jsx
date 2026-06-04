@@ -20,43 +20,53 @@ const normalizeCategory = (category) => {
   return { value: fallback, label: fallback };
 };
 
-const CategoryFilter = ({ categories, selectedCategory, onChange }) => (
-  <div>
-    <h3 className="text-sm font-semibold text-slate-900">Category</h3>
-    <div className="mt-3 space-y-2">
-      <label className={ITEM_CLASSES} htmlFor="category-all">
-        <input
-          id="category-all"
-          name="category"
-          type="checkbox"
-          className={CHECKBOX_CLASSES}
-          checked={!selectedCategory}
-          onChange={() => onChange('')}
-        />
-        <span>All</span>
-      </label>
-      {categories.map((category) => {
-        const normalized = normalizeCategory(category);
-        return (
-          <label
-            key={normalized.value}
-            className={ITEM_CLASSES}
-            htmlFor={`category-${normalized.value}`}
-          >
-            <input
-              id={`category-${normalized.value}`}
-              name="category"
-              type="checkbox"
-              className={CHECKBOX_CLASSES}
-              checked={selectedCategory === normalized.value}
-              onChange={() => onChange(normalized.value)}
-            />
-            <span className="capitalize">{normalized.label}</span>
-          </label>
-        );
-      })}
+const CategoryFilter = ({ categories, selectedCategories, onChange }) => {
+  const handleToggle = (category) => {
+    if (selectedCategories.includes(category)) {
+      onChange(selectedCategories.filter((item) => item !== category));
+      return;
+    }
+    onChange([...selectedCategories, category]);
+  };
+
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-slate-900">Category</h3>
+      <div className="mt-3 space-y-2">
+        <label className={ITEM_CLASSES} htmlFor="category-all">
+          <input
+            id="category-all"
+            name="category"
+            type="checkbox"
+            className={CHECKBOX_CLASSES}
+            checked={selectedCategories.length === 0}
+            onChange={() => onChange([])}
+          />
+          <span>All</span>
+        </label>
+        {categories.map((category) => {
+          const normalized = normalizeCategory(category);
+          return (
+            <label
+              key={normalized.value}
+              className={ITEM_CLASSES}
+              htmlFor={`category-${normalized.value}`}
+            >
+              <input
+                id={`category-${normalized.value}`}
+                name="category"
+                type="checkbox"
+                className={CHECKBOX_CLASSES}
+                checked={selectedCategories.includes(normalized.value)}
+                onChange={() => handleToggle(normalized.value)}
+              />
+              <span className="capitalize">{normalized.label}</span>
+            </label>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default React.memo(CategoryFilter);

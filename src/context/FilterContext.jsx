@@ -6,7 +6,8 @@ const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 8;
 
 const ACTIONS = {
-  SET_CATEGORY: 'SET_CATEGORY',
+  SET_CATEGORIES: 'SET_CATEGORIES',
+  SET_SEARCH: 'SET_SEARCH',
   SET_MIN_PRICE: 'SET_MIN_PRICE',
   SET_MAX_PRICE: 'SET_MAX_PRICE',
   SET_BRANDS: 'SET_BRANDS',
@@ -16,7 +17,8 @@ const ACTIONS = {
 };
 
 const BASE_STATE = {
-  category: '',
+  categories: [],
+  search: '',
   minPrice: '',
   maxPrice: '',
   brands: [],
@@ -26,9 +28,11 @@ const BASE_STATE = {
 
 const parseFiltersFromSearch = (search) => {
   const params = new URLSearchParams(search);
+  const categoriesParam = params.get('categories') || params.get('category') || '';
   return {
     ...BASE_STATE,
-    category: params.get('category') || '',
+    categories: categoriesParam ? categoriesParam.split(',').filter(Boolean) : [],
+    search: params.get('search') || '',
     minPrice: params.get('minPrice') || '',
     maxPrice: params.get('maxPrice') || '',
     brands: params.get('brands') ? params.get('brands').split(',') : [],
@@ -38,8 +42,10 @@ const parseFiltersFromSearch = (search) => {
 
 const filterReducer = (state, action) => {
   switch (action.type) {
-    case ACTIONS.SET_CATEGORY:
-      return { ...state, category: action.payload, page: DEFAULT_PAGE };
+    case ACTIONS.SET_CATEGORIES:
+      return { ...state, categories: action.payload, page: DEFAULT_PAGE };
+    case ACTIONS.SET_SEARCH:
+      return { ...state, search: action.payload, page: DEFAULT_PAGE };
     case ACTIONS.SET_MIN_PRICE:
       return { ...state, minPrice: action.payload, page: DEFAULT_PAGE };
     case ACTIONS.SET_MAX_PRICE:
@@ -70,7 +76,8 @@ export const FilterProvider = ({ children }) => {
 
   useEffect(() => {
     const params = new URLSearchParams();
-    if (filters.category) params.set('category', filters.category);
+    if (filters.categories.length) params.set('categories', filters.categories.join(','));
+    if (filters.search) params.set('search', filters.search);
     if (filters.minPrice) params.set('minPrice', filters.minPrice);
     if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
     if (filters.brands.length) params.set('brands', filters.brands.join(','));
@@ -80,8 +87,10 @@ export const FilterProvider = ({ children }) => {
 
   const value = {
     filters,
-    setCategory: (category) =>
-      dispatch({ type: ACTIONS.SET_CATEGORY, payload: category }),
+    setCategories: (categories) =>
+      dispatch({ type: ACTIONS.SET_CATEGORIES, payload: categories }),
+    setSearch: (search) =>
+      dispatch({ type: ACTIONS.SET_SEARCH, payload: search }),
     setMinPrice: (minPrice) =>
       dispatch({ type: ACTIONS.SET_MIN_PRICE, payload: minPrice }),
     setMaxPrice: (maxPrice) =>

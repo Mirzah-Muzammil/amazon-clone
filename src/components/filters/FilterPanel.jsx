@@ -1,5 +1,5 @@
 // src/components/filters/FilterPanel.jsx
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import BrandFilter from './BrandFilter';
 import CategoryFilter from './CategoryFilter';
 import PriceFilter from './PriceFilter';
@@ -16,6 +16,14 @@ const APPLY_BUTTON =
 const CLEAR_BUTTON =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 transition hover:bg-slate-100';
 
+const getCategoryText = (category) => {
+  if (typeof category === 'string') return category.replace(/-/g, ' ');
+  if (category && typeof category === 'object') {
+    return String(category.name || category.slug || category.id || category);
+  }
+  return String(category);
+};
+
 const FilterPanel = ({
   categories,
   brands,
@@ -26,6 +34,21 @@ const FilterPanel = ({
   onBrandChange,
   onClear,
 }) => {
+  const [filterSearch, setFilterSearch] = useState('');
+  const normalizedFilterSearch = filterSearch.trim().toLowerCase();
+  const visibleCategories = useMemo(() => {
+    if (!normalizedFilterSearch) return categories;
+    return categories.filter((category) =>
+      getCategoryText(category).toLowerCase().includes(normalizedFilterSearch)
+    );
+  }, [categories, normalizedFilterSearch]);
+  const visibleBrands = useMemo(() => {
+    if (!normalizedFilterSearch) return brands;
+    return brands.filter((brand) =>
+      brand.toLowerCase().includes(normalizedFilterSearch)
+    );
+  }, [brands, normalizedFilterSearch]);
+
   return (
     <aside className="h-full min-h-0 overflow-y-auto lg:sticky lg:top-4">
       <div className={PANEL_CLASSES}>
@@ -37,13 +60,18 @@ const FilterPanel = ({
                 d="M21 20.3 16.7 16A7.5 7.5 0 1 0 16 16.7L20.3 21 21 20.3zM10.5 17A6.5 6.5 0 1 1 17 10.5 6.5 6.5 0 0 1 10.5 17z"
               />
             </svg>
-            <input className={SEARCH_INPUT} placeholder="Search..." />
+            <input
+              className={SEARCH_INPUT}
+              placeholder="Search filters..."
+              value={filterSearch}
+              onChange={(event) => setFilterSearch(event.target.value)}
+            />
           </div>
         </div>
         <div className={SECTION_CLASSES}>
           <CategoryFilter
-            categories={categories}
-            selectedCategory={filters.category}
+            categories={visibleCategories}
+            selectedCategories={filters.categories}
             onChange={onCategoryChange}
           />
           <div>
@@ -58,7 +86,7 @@ const FilterPanel = ({
             </button>
           </div>
           <BrandFilter
-            brands={brands}
+            brands={visibleBrands}
             selectedBrands={filters.brands}
             onChange={onBrandChange}
           />

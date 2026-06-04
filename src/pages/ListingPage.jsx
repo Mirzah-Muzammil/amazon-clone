@@ -36,7 +36,8 @@ const PRODUCT_SECTION_CLASSES = 'h-full min-h-0 overflow-y-auto pb-10';
 const ListingPage = () => {
   const {
     filters,
-    setCategory,
+    setCategories,
+    setSearch,
     setMinPrice,
     setMaxPrice,
     setBrands,
@@ -81,7 +82,12 @@ const ListingPage = () => {
                   d="M21 20.3 16.7 16A7.5 7.5 0 1 0 16 16.7L20.3 21 21 20.3zM10.5 17A6.5 6.5 0 1 1 17 10.5 6.5 6.5 0 0 1 10.5 17z"
                 />
               </svg>
-              <input className={SEARCH_INPUT} placeholder="Search products..." />
+              <input
+                className={SEARCH_INPUT}
+                placeholder="Search products..."
+                value={filters.search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
             </div>
             <div className={ACTIONS_WRAP}>
               <button type="button" className={ICON_BUTTON} aria-label="Cart">
@@ -113,7 +119,7 @@ const ListingPage = () => {
                 categories={categories}
                 brands={uniqueBrands}
                 filters={filters}
-                onCategoryChange={setCategory}
+                onCategoryChange={setCategories}
                 onMinPriceChange={setMinPrice}
                 onMaxPriceChange={setMaxPrice}
                 onBrandChange={setBrands}

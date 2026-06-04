@@ -18,6 +18,17 @@ export const getProducts = async (
   signal,
 ) => fetchJson(`${API_BASE}/products?limit=${limit}&skip=${skip}`, signal);
 
+export const searchProducts = async (
+  query,
+  limit = DEFAULT_LIMIT,
+  skip = DEFAULT_SKIP,
+  signal,
+) =>
+  fetchJson(
+    `${API_BASE}/products/search?q=${encodeURIComponent(query)}&limit=${limit}&skip=${skip}`,
+    signal,
+  );
+
 export const getProductsByCategory = async (
   category,
   limit = DEFAULT_LIMIT,
